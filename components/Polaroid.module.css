@@ -1,0 +1,113 @@
+/* ═══════════════════════════════════════════════════════════════
+   Frame — a print that dissolves into pure white
+   Strategy A (#FFF match) + Strategy C (mix-blend-mode: multiply)
+   ═══════════════════════════════════════════════════════════════ */
+
+.card {
+  position: relative;
+  display: block;
+  width: 100%;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── The print ─────────────────────────────────────────────── */
+.frame {
+  position: relative;
+  width: 100%;
+  /* supplied file = square white canvas with the polaroid inside */
+  aspect-ratio: 1 / 1;
+
+  /* white canvas × white page → the border vanishes entirely.
+     the photo & warm polaroid card multiply through, untouched. */
+  mix-blend-mode: multiply;
+
+  /* Strategy B — feather generously so even full-bleed prints melt
+     into the page. Masking white margins → transparent is invisible
+     (page is white too), so this only dissolves real edge content. */
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    #000 58%,
+    transparent 96%
+  );
+  mask-image: radial-gradient(circle at center, #000 58%, transparent 96%);
+
+  transition: transform 0.7s var(--ease), filter 0.7s var(--ease);
+  will-change: transform;
+}
+
+.frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* brightness clips near-white JPEG ringing (248-254) up to pure 255
+     so multiply leaves zero box; barely touches the photo midtones. */
+  filter: brightness(1.06) contrast(1.04) saturate(0.99);
+  transition: filter 0.8s var(--ease);
+}
+
+/* developing shimmer (kept inside the photo, neutral so no seam) */
+.frame[data-loaded="false"]::after {
+  content: "";
+  position: absolute;
+  inset: 14%;
+  background: linear-gradient(110deg, #f0f0ee 8%, #e4e4e1 18%, #f0f0ee 33%);
+  background-size: 220% 100%;
+  animation: develop 1.5s var(--ease-inout) infinite;
+}
+
+@keyframes develop {
+  to { background-position: -220% 0; }
+}
+
+/* Hover: the print breathes forward. Depth comes from scale +
+   tonal lift, never a box-shadow (which would expose the square). */
+.card:hover .frame {
+  transform: scale(1.035) translateY(-4px);
+}
+
+.card:hover .frame img {
+  filter: brightness(1.06) contrast(1.07) saturate(1.05);
+}
+
+/* ── Whisper tag (appears on hover) ────────────────────────── */
+.tag {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  transform: translate(-50%, 14px);
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
+}
+
+.card:hover .tag {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.idx {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.tagTitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.tagHan {
+  font-family: var(--font-han);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--muted);
+}

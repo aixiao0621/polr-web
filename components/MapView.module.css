@@ -1,0 +1,378 @@
+.atlas {
+  position: relative;
+  width: 100%;
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: clamp(24px, 5vh, 56px);
+}
+
+.introHan {
+  font-family: var(--font-han);
+  font-size: clamp(30px, 5vw, 52px);
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: var(--ink);
+}
+
+.introEn {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── Map canvas ────────────────────────────────────────────── */
+.canvas {
+  position: relative;
+  width: min(860px, 88vw);
+  aspect-ratio: 1000 / 700;
+  margin: 0 auto;
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.silhouette {
+  fill: rgba(14, 14, 13, 0.025);
+  stroke: var(--faint);
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  opacity: 0.7;
+}
+
+.silhouetteGlow {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 10;
+  opacity: 0.05;
+  filter: blur(14px);
+}
+
+/* drifting fog — pale, weightless */
+.fog {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(40px);
+  opacity: 0.6;
+  mix-blend-mode: multiply;
+}
+
+.fog1 {
+  width: 48%; height: 40%;
+  left: 6%; top: 8%;
+  background: radial-gradient(circle, rgba(214,69,43,0.06), transparent 70%);
+  animation: drift1 20s ease-in-out infinite alternate;
+}
+.fog2 {
+  width: 52%; height: 38%;
+  right: 4%; top: 38%;
+  background: radial-gradient(circle, rgba(110,110,105,0.08), transparent 70%);
+  animation: drift2 24s ease-in-out infinite alternate;
+}
+.fog3 {
+  width: 44%; height: 36%;
+  left: 18%; bottom: 4%;
+  background: radial-gradient(circle, rgba(154,154,148,0.07), transparent 70%);
+  animation: drift1 28s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes drift1 {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(20px, -22px) scale(1.12); }
+}
+@keyframes drift2 {
+  from { transform: translate(0, 0) scale(1.05); }
+  to   { transform: translate(-22px, 18px) scale(1); }
+}
+
+/* constellation links */
+.links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.link {
+  stroke: var(--accent);
+  stroke-width: 0.4;
+  opacity: 0.2;
+  stroke-dasharray: 1.4 3;
+}
+
+/* ── Markers ───────────────────────────────────────────────── */
+.marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  z-index: 3;
+  background: none;
+}
+
+.dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.9);
+  transition: transform 0.4s var(--ease-spring);
+}
+
+.dot::before {
+  /* pulsing halo */
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(214,69,43,0.4), transparent 70%);
+  animation: pulse 3.4s ease-in-out infinite;
+}
+
+.dot::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid rgba(214,69,43,0.35);
+  animation: ripple 3.4s ease-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%      { transform: scale(1.5); opacity: 0.25; }
+}
+@keyframes ripple {
+  0%   { transform: scale(0.6); opacity: 0.7; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+.marker:hover .dot {
+  transform: scale(1.4);
+}
+
+/* multi-frame cities wear a faint orbit ring */
+.dotRing {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(214, 69, 43, 0.45);
+  animation: orbit 6s linear infinite;
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg) scale(1); }
+  50%  { transform: rotate(180deg) scale(1.12); }
+  to   { transform: rotate(360deg) scale(1); }
+}
+
+.markerActive .dot {
+  transform: scale(1.5);
+}
+
+.label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-family: var(--font-han);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--grey);
+  white-space: nowrap;
+  background: rgba(255,255,255,0.78);
+  padding: 2px 8px;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+  transition: color 0.3s var(--ease), background 0.3s var(--ease);
+}
+
+.marker:hover .label {
+  color: var(--ink);
+  background: rgba(255,255,255,0.95);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent);
+}
+
+/* ── Hover preview — fanned stack ──────────────────────────── */
+.preview {
+  position: absolute;
+  z-index: 20;
+  width: 150px;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.previewStack {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.previewCard {
+  position: absolute;
+  inset: 0;
+  transform: translateX(calc(var(--i, 0) * 18px))
+    rotate(calc(var(--i, 0) * 4deg));
+  transform-origin: bottom center;
+}
+
+.previewImg {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(circle at center, #000 58%, transparent 96%);
+  mask-image: radial-gradient(circle at center, #000 58%, transparent 96%);
+}
+
+.previewImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(1.06) contrast(1.04);
+}
+
+.previewHint {
+  font-family: var(--font-han);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.82);
+  padding: 2px 9px;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Expanded contact sheet ────────────────────────────────── */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 9400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 6vh, 64px);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.sheet {
+  width: 100%;
+  max-width: 880px;
+}
+
+.sheetHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: clamp(28px, 5vh, 52px);
+}
+
+.sheetHan {
+  font-family: var(--font-han);
+  font-size: clamp(26px, 4vw, 40px);
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  color: var(--ink);
+}
+
+.sheetMeta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.sheetGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: clamp(24px, 4vw, 48px);
+  justify-items: center;
+}
+
+.sheetItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 240px;
+  background: none;
+}
+
+.sheetImg {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(circle at center, #000 58%, transparent 96%);
+  mask-image: radial-gradient(circle at center, #000 58%, transparent 96%);
+  transition: transform 0.6s var(--ease);
+}
+
+.sheetImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(1.06) contrast(1.04) saturate(0.99);
+}
+
+.sheetItem:hover .sheetImg {
+  transform: scale(1.035) translateY(-4px);
+}
+
+.sheetTitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+
+.sheetItem:hover .sheetTitle {
+  opacity: 1;
+}
+
+@media (max-width: 560px) {
+  .canvas { width: 94vw; }
+  .label { font-size: 10px; }
+  .preview { width: 116px; }
+  .previewStack { width: 116px; height: 116px; }
+  .sheetGrid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}

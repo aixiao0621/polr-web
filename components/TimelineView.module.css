@@ -1,0 +1,300 @@
+.timeline {
+  position: relative;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/* ── Collapsible year / month scrubber ─────────────────────── */
+.scrubber {
+  position: fixed;
+  right: clamp(18px, 3vw, 46px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.8vh, 18px);
+  padding: 4px 0;
+}
+
+/* faint connecting thread behind the ticks */
+.scrubberLine {
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--line) 12%,
+    var(--line) 88%,
+    transparent
+  );
+}
+
+/* one year and its (optionally expanded) months */
+.tickGroup {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.4vh, 14px);
+}
+
+/* the months column animates open under the active year.
+   vertical padding (with a compensating negative margin) keeps the
+   overflow:hidden clip box from cutting the active dot's red halo
+   where it meets the year above. */
+.tickMonths {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.4vh, 14px);
+  overflow: hidden;
+  padding: 9px 0 9px 14px;
+  margin: -5px 0;
+}
+
+.tick {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  cursor: pointer;
+}
+
+.tickDot {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+  box-shadow: inset 0 0 0 1px var(--faint);
+  background: var(--white);
+  transition: box-shadow 0.4s var(--ease);
+}
+
+.tickHalo {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(214, 69, 43, 0.14);
+}
+
+/* the centre fill of the active dot sits above the halo */
+.tickOn .tickDot {
+  box-shadow: inset 0 0 0 1px var(--accent);
+  background: var(--white);
+}
+
+.tickOn .tickDot::after {
+  content: "";
+  position: absolute;
+  inset: 2.5px;
+  border-radius: 50%;
+  background: var(--accent);
+  z-index: 1;
+}
+
+.tickLabel {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.tickMonth {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--faint);
+  transition: color 0.4s var(--ease);
+}
+
+.tickYear {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  transition: color 0.4s var(--ease);
+}
+
+/* dim a year that isn't currently expanded, lift the open one */
+.tickGroup .tickYear {
+  color: var(--faint);
+}
+.tickGroupOpen .tickYear {
+  color: var(--ink);
+}
+
+.tickOn .tickMonth {
+  color: var(--accent);
+}
+
+.tickOn .tickYear {
+  color: var(--accent);
+}
+
+.tick:hover .tickMonth,
+.tick:hover .tickYear {
+  color: var(--grey);
+}
+
+.tick:hover .tickDot {
+  box-shadow: inset 0 0 0 1px var(--grey);
+}
+
+/* ── Year chapter — sticky rail + editorial flow ───────────── */
+.chapter {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(160px, 0.5fr) minmax(0, 2.4fr);
+  gap: clamp(24px, 5vw, 80px);
+  margin-bottom: clamp(96px, 16vh, 200px);
+  scroll-margin-top: 18vh;
+}
+
+.chapter:last-child {
+  margin-bottom: 0;
+}
+
+/* sticky year on the left */
+.rail {
+  position: relative;
+}
+
+.railInner {
+  position: sticky;
+  top: 18vh;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.year {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(54px, 8vw, 132px);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+}
+
+.monthLine {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.monthHan {
+  font-family: var(--font-han);
+  font-size: clamp(17px, 1.8vw, 22px);
+  letter-spacing: 0.14em;
+  color: var(--ink);
+}
+
+.monthEn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.yearCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+}
+
+/* ── Editorial frame flow ──────────────────────────────────── */
+.flow {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(36px, 5vw, 80px) clamp(32px, 4vw, 64px);
+  align-items: start;
+  padding-top: 10px;
+}
+
+.cell {
+  width: 100%;
+}
+
+/* editorial rhythm — offset variation by pattern */
+.cell[data-span="0"] { transform: translateY(0); }
+.cell[data-span="1"] { transform: translateY(clamp(28px, 6vh, 72px)); }
+.cell[data-span="2"] { transform: translateY(clamp(10px, 2vh, 24px)); }
+.cell[data-span="3"] { transform: translateY(clamp(40px, 8vh, 96px)); }
+.cell[data-span="4"] { transform: translateY(0); }
+
+/* every 5th frame (1st of group) becomes a centered hero moment */
+.cell:nth-child(5n + 1) {
+  grid-column: 1 / -1;
+  max-width: 62%;
+  margin: clamp(12px, 3vh, 36px) auto;
+  transform: none;
+}
+
+/* ── Closing colophon ──────────────────────────────────────── */
+.end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-top: clamp(60px, 10vh, 120px);
+  padding-top: clamp(40px, 7vh, 80px);
+  border-top: 1px solid var(--line);
+}
+
+.endHan {
+  font-family: var(--font-han);
+  font-size: 30px;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+.endMark {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .scrubber { display: none; }
+  .chapter {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .railInner {
+    position: relative;
+    top: 0;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 16px;
+  }
+  .year { font-size: clamp(48px, 14vw, 88px); }
+  .flow { gap: 40px clamp(24px, 4vw, 48px); }
+  .cell:nth-child(5n + 1) { max-width: 80%; }
+}
+
+@media (max-width: 560px) {
+  .flow {
+    grid-template-columns: 1fr;
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .cell,
+  .cell[data-span] {
+    transform: none;
+  }
+  .cell:nth-child(5n + 1) {
+    max-width: 100%;
+    margin: 0;
+  }
+}
